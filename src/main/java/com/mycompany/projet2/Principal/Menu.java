@@ -1009,6 +1009,7 @@ try {
     // Récupérez la date sous forme de chaîne de caractères
     String dateString = new SimpleDateFormat("yyyy-MM-dd").format(jDateChooser1.getDate());
 
+
     // Obtenez l'heure locale
     LocalTime localTime = LocalTime.now();
 
@@ -1023,7 +1024,6 @@ try {
     SimpleDateFormat datetimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     java.util.Date dateTime = datetimeFormat.parse(dateTimeString);
     Timestamp timestamp = new Timestamp(dateTime.getTime());
-
     // Le reste du code pour insérer le pointage dans la base de données
     PreparedStatement stmt = conn.prepareStatement("INSERT INTO \"pointage\" (\"datepointage\", \"numemp\", \"pointage\") VALUES (CAST(? AS timestamp with time zone), ?, ?)");
     stmt.setTimestamp(1, timestamp);
@@ -1062,24 +1062,47 @@ try {
     }//GEN-LAST:event_ajt_pointageActionPerformed
 
     private void ajouter3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ajouter3ActionPerformed
- int option = JOptionPane.showConfirmDialog(null, "Êtes-vous sûr de vouloir supprimer ce pointage ?", "Confirmation de suppression", JOptionPane.YES_NO_OPTION);
-if (option == JOptionPane.YES_OPTION) {
-    try {
-        conn = Connectionsql.connexion();
-        PreparedStatement stmt = conn.prepareStatement("DELETE FROM pointage WHERE datepointage = ?");
-        stmt.setTimestamp(1, new Timestamp(jDateChooser1.getDate().getTime()));
-        stmt.executeUpdate();
-        jDateChooser1.setDate(null);
-        numemppoint.setText("");
-        pointage.setSelectedIndex(-1);
-        conn.close();
+try {
+    Connection conn = Connectionsql.connexion();
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    String dateString = dateFormat.format(jDateChooser1.getDate());
+
+    LocalTime localTime = LocalTime.now();
+    DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
+    String timeString = localTime.format(timeFormatter);
+
+    String dateTimeString = dateString + " " + timeString;
+    SimpleDateFormat datetimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+    java.util.Date dateTime = datetimeFormat.parse(dateTimeString);
+    Timestamp timestamp = new Timestamp(dateTime.getTime());
+
+    PreparedStatement stmt = conn.prepareStatement("DELETE FROM pointage WHERE datepointage = ?");
+    stmt.setTimestamp(1, timestamp);
+
+    int rowsAffected = stmt.executeUpdate();
+    conn.close();
+
+    if (rowsAffected > 0) {
         JOptionPane.showMessageDialog(null, "Pointage supprimé");
         Tablepointage();
-    } catch (Exception e) {
-        JOptionPane.showMessageDialog(null, "Erreur lors de la suppression du pointage : " + e.getMessage());
-        e.printStackTrace();
+    } else {
+        JOptionPane.showMessageDialog(null, "Aucun pointage n'a été supprimé");
     }
+
+    // Réinitialiser les valeurs
+    jFormattedTextField1.setText("");
+    jDateChooser1.setDate(null);
+    numemppoint.setText("");
+    pointage.setSelectedIndex(-1);
+} catch (Exception e) {
+    JOptionPane.showMessageDialog(null, "Erreur lors de la suppression du pointage : " + e.getMessage());
+    e.printStackTrace();
 }
+
+
+
+
+
 
 
 
