@@ -1,0 +1,43 @@
+name: Format
+
+on: push
+
+jobs:
+
+  formatting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2 # v2 minimum required
+      - uses: LGoodDatePicker/googlejavaformat-action@v3
+        with:
+          args: "--replace"
+          
+##### Notes #####
+
+### Do not use AOSP to try to get 4 space tabs:
+# Because, AOSP has ridiculous 8 space line continuations. 
+
+### Used action repository:
+# The original action repository is here. (The master version.):
+# Link: https://github.com/axel-op/googlejavaformat-action
+# Original action line:  - uses: axel-op/googlejavaformat-action@v3
+#
+# However, we are using our own fork of this action. 
+# Action line for our fork:  - uses: LGoodDatePicker/googlejavaformat-action@v3
+
+### Reason for using a fork:
+# The advantage of having our own fork of this action is that if the "axel-op" repository is
+# ever broken, then that break will not automatically break our own code. 
+# (Because we are not directly using the "axel-op" repository in our workflow.)
+
+### How to update our forked action repository:
+# Our fork of the action repository will only be updated when we manually click the update 
+# button in the LGoodDatePicker/googlejavaformat-action repository. 
+# The update button is named "Fetch Upstream". Clicking this button will update the fork to
+# the latest version of the action. 
+
+### We only use a 'push' trigger, and not a 'pull_request' trigger. 
+# Reason: From testing, it appears that when a 'pull_request' trigger is used, it causes the 
+# format action to fail during any pull request that originates from any forked repository. 
+# This change fixes issues discussed in the pull requests listed below.
+# Pull requests, #152, #156, #158, #159, #160, #161, #163, #164.
